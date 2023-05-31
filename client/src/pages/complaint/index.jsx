@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './header.css'
 import Header from '../../features/header';
 import PropTypes from "prop-types";
+import { apiBaseUrl } from '../../config';
 
 Complaint.propTypes = {
   userId: PropTypes.string
@@ -16,7 +17,7 @@ export default function Complaint({ userId }) {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/complaints', {
+      const res = await fetch(`${apiBaseUrl}complaints`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

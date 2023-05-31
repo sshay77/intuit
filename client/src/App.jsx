@@ -5,12 +5,13 @@ import Login from './pages/login/index';
 import Complaint from "./pages/complaint/index";
 import AllComplaints from "./pages/all-complaints";
 import ComplaintDetails from "./pages/complaint-details";
+import { apiBaseUrl } from './config';
 
 function App() {
   const [user, setUser] = useState({});
 
   const handleUserChange = async (e) => {
-    const response = await fetch('http://localhost:5000/api/users/' + e.target.value)
+    const response = await fetch(`${apiBaseUrl}users/${e.target.value}`)
       .then(res => res.json());
     if (response.success === true) {
       setUser(response.data)

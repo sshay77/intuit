@@ -5,8 +5,21 @@ const Queue = require('bee-queue');
 const purchaseQueue = new Queue('purchase');
 const userQueue = new Queue('user');
 
+function pushComplaintToQueue(complaintId) {
+    const purchaseJob = purchaseQueue.createJob({ id: complaintId });
+    purchaseJob.save();
+    purchaseJob.on('purchase succeeded', (result) => {
+        console.log(`Received result for purchase job ${purchaseJob.id}: ${result}`);
+    });
+
+    const userJob = userQueue.createJob({ id: complaintId });
+    userJob.save();
+    userJob.on('user succeeded', (result) => {
+        console.log(`Received result for user job ${userJob.id}: ${result}`);
+    });
+}
+
 router.get('/details/:complaintId', async (req, res) => {
-    console.log(req.params);
     const { complaintId } = req.params;
     const complaint = await Complaint.findById(complaintId);
     let needToSave = false;
@@ -24,7 +37,7 @@ router.get('/details/:complaintId', async (req, res) => {
         complaint.user = data;
         needToSave = true;
     }
-    
+
     if (needToSave) {
         await complaint.save();
     }
@@ -42,10 +55,10 @@ router.post('/', async (req, res) => {
         const newComplaint = new Complaint(req.body);
         const resp = await newComplaint.save();
         const complaintId = resp._id.toString();
-                
+
         pushComplaintToQueue(complaintId);
 
-        res.status(200).json({ success: true, data: resp.toJSON()});
+        res.status(200).json({ success: true, data: resp.toJSON() });
     } catch (e) {
         console.error(e);
         res.send({
@@ -71,17 +84,3 @@ router.get('/', async (req, res) => {
 });
 
 module.exports = router;
-
-function pushComplaintToQueue(complaintId) {
-    const purchaseJob = purchaseQueue.createJob({ id: complaintId });
-    purchaseJob.save();
-    purchaseJob.on('purchase succeeded', (result) => {
-        console.log(`Received result for purchase job ${purchaseJob.id}: ${result}`);
-    });
-
-    const userJob = userQueue.createJob({ id: complaintId });
-    userJob.save();
-    userJob.on('user succeeded', (result) => {
-        console.log(`Received result for user job ${userJob.id}: ${result}`);
-    });
-}

@@ -3,6 +3,7 @@ import './all-complaints.css';
 import {useState, useEffect} from 'react';
 import Header from '../../features/header'; 
 import {Link} from 'react-router-dom'
+import { apiBaseUrl } from '../../config';
 
 export default function AllComplaints() {
     const [allComplaints, setAllComplaints] = useState([]);
@@ -12,7 +13,7 @@ export default function AllComplaints() {
     }, []);
 
     function loadAllComplaints() {
-        fetch('http://localhost:5000/api/complaints')
+        fetch(`${apiBaseUrl}complaints`)
             .then(res => res.json())
             .then(data => setAllComplaints(data.data));
     }
